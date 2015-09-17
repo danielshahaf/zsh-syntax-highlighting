@@ -91,6 +91,16 @@ for data_file in ${0:h:h}/highlighters/$1/test-data/*; do
           observed_result[$j]=$highlight_zone[3]
         done
       done
+      print -ru2 -
+      () {
+        local -a a
+        local i j
+        for i in ${(kon)observed_result}; do
+          a+=( "$i $observed_result[$i]" )
+        done
+        print -ru2 - ${(q-)a}
+      }
+      print -ru2 - ${(q-)expected_region_highlight}
 
       # Then we compare the observed result with the expected one.
       for i in {1..${#expected_region_highlight}}; do
