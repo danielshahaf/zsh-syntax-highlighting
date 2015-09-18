@@ -121,6 +121,8 @@ _zsh_highlight()
       fi
     }
 
+    ret=0
+
 
 
   } always {
