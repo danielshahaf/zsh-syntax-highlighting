@@ -172,15 +172,17 @@ _zsh_highlight_main_highlighter()
                             # (For array assignments, the command doesn't start until the ")" token.)
                             new_expression=true; highlight_glob=true
                           fi
-                        elif _zsh_highlight_main_highlighter_check_path; then
-                          style=$ZSH_HIGHLIGHT_STYLES[path]
                         elif [[ $arg[0,1] == $histchars[0,1] || $arg[0,1] == $histchars[2,2] ]]; then
                           style=$ZSH_HIGHLIGHT_STYLES[history-expansion]
                         elif [[ $arg[1] == '<' || $arg[1] == '>' ]]; then
                           style=$ZSH_HIGHLIGHT_STYLE[redirection]
                           redirection=true
                         else
-                          style=$ZSH_HIGHLIGHT_STYLES[unknown-token]
+                          if _zsh_highlight_main_highlighter_check_path; then
+                            style=$ZSH_HIGHLIGHT_STYLES[path]
+                          else
+                            style=$ZSH_HIGHLIGHT_STYLES[unknown-token]
+                          fi
                         fi
                         ;;
       esac
@@ -203,14 +205,17 @@ _zsh_highlight_main_highlighter()
                  ;;
         '`'*)    style=$ZSH_HIGHLIGHT_STYLES[back-quoted-argument];;
         *[*?]*)  $highlight_glob && style=$ZSH_HIGHLIGHT_STYLES[globbing] || style=$ZSH_HIGHLIGHT_STYLES[default];;
-        *)       if _zsh_highlight_main_highlighter_check_path; then
-                   style=$ZSH_HIGHLIGHT_STYLES[path]
+        *)       if false; then
                  elif [[ $arg[0,1] = $histchars[0,1] ]]; then
                    style=$ZSH_HIGHLIGHT_STYLES[history-expansion]
                  elif [[ -n ${(M)ZSH_HIGHLIGHT_TOKENS_COMMANDSEPARATOR:#"$arg"} ]]; then
                    style=$ZSH_HIGHLIGHT_STYLES[commandseparator]
                  else
-                   style=$ZSH_HIGHLIGHT_STYLES[default]
+                   if _zsh_highlight_main_highlighter_check_path; then
+                     style=$ZSH_HIGHLIGHT_STYLES[path]
+                   else
+                     style=$ZSH_HIGHLIGHT_STYLES[default]
+                   fi
                  fi
                  ;;
       esac
