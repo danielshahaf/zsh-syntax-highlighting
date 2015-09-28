@@ -199,7 +199,7 @@ _zsh_highlight_main_highlighter()
                           _zsh_highlight_main_add_region_highlight $start_pos $((start_pos + 2)) $style
                           substr_color=1
                         else
-                          if _zsh_highlight_main_highlighter_check_path; then
+                          if _zsh_highlight_main_highlighter_check_path 1; then
                             style=$ZSH_HIGHLIGHT_STYLES[path]
                           else
                             style=$ZSH_HIGHLIGHT_STYLES[unknown-token]
@@ -238,7 +238,7 @@ _zsh_highlight_main_highlighter()
                  elif [[ $arg[1] == '<' || $arg[1] == '>' ]]; then
                    style=$ZSH_HIGHLIGHT_STYLES[redirection]
                  else
-                   if _zsh_highlight_main_highlighter_check_path; then
+                   if _zsh_highlight_main_highlighter_check_path 0; then
                      style=$ZSH_HIGHLIGHT_STYLES[path]
                    else
                      style=$ZSH_HIGHLIGHT_STYLES[default]
@@ -264,13 +264,20 @@ _zsh_highlight_main_highlighter_check_assign()
 }
 
 # Check if $arg is a path.
+# The sole positional argument is 1 if at command word position and 0 otherwise.
 _zsh_highlight_main_highlighter_check_path()
 {
+  integer at_command_word=$1
   _zsh_highlight_main_highlighter_expand_path $arg;
   local expanded_path="$REPLY"
 
   [[ -z $expanded_path ]] && return 1
-  [[ -e $expanded_path ]] && return 0
+  if (( $at_command_word )); then
+    # $expanded_path may be an executable file, or a listable directory; either is good
+    [[ -x $expanded_path ]] && return 0
+  else
+    [[ -e $expanded_path ]] && return 0
+  fi
 
   # Search the path in CDPATH
   local cdpath_dir
@@ -284,10 +291,18 @@ _zsh_highlight_main_highlighter_check_path()
   # If this word ends the buffer, check if it's the prefix of a valid path.
   if [[ ${BUFFER[1]} != "-" && ${#BUFFER} == $end_pos ]]; then
     local -a tmp
-    tmp=( ${expanded_path}*(N) )
+    if (( $at_command_word )); then
+      tmp=( ${expanded_path}*?(N-f:u+x,g+x,o+x:) )
+    else
+      tmp=( ${expanded_path}*?(N) )
+    fi
     (( $#tmp > 0 )) && style_override=path_prefix && return 0
     # or maybe an approximate path?
-    tmp=( (#a1)${expanded_path}*(N) )
+    if (( $at_command_word )); then
+      tmp=( (#a1)${expanded_path}*(N-f:u+x,g+x,o+x:) )
+    else
+      tmp=( (#a1)${expanded_path}*(N) )
+    fi
     (( $#tmp > 0 )) && style_override=path_approx && return 0
   fi
 
