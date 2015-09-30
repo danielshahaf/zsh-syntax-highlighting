@@ -203,7 +203,7 @@ _zsh_highlight_bind_widgets()
 }
 
 if (( $zsh_highlight_use_redrawhook )); then
-  _zsh_highlight_bind_widgets();
+  _zsh_highlight_bind_widgets(){}
   zle -N zle-line-pre-redraw _zsh_highlight
 fi
 
