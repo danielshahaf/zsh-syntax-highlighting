@@ -122,6 +122,14 @@ _zsh_highlight()
       fi
     }
 
+    # TODO: This hardcodes the Src/Zle/iwidgets.list information of "which widgets have ZLE_KILL set"
+    # TODO: derive that information
+    case $WIDGET in
+    (kill-*|backward-kill-*) zle -f 'kill';;
+    (vi-put-before) zle -f 'yankbefore';;
+    (bracketed-paste|vi-put-after|yank) zle -f 'yank';;
+    esac
+
     return $ret
 
 
