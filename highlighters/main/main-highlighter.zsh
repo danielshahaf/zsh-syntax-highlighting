@@ -60,7 +60,7 @@
 _zsh_highlight_main_highlighter_predicate()
 {
   # accept-* may trigger removal of path_prefix highlighting
-  [[ $WIDGET == accept-* ]] ||
+  false ||
     _zsh_highlight_buffer_modified
 }
 
@@ -283,7 +283,7 @@ _zsh_highlight_main_highlighter_check_path()
 
   # If this word ends the buffer, check if it's the prefix of a valid path.
   if [[ ${BUFFER[1]} != "-" && ${#BUFFER} == $end_pos ]] &&
-     [[ $WIDGET != accept-* ]]; then
+     true; then
     local -a tmp
     tmp=( ${expanded_path}*(N) )
     (( $#tmp > 0 )) && style_override=path_prefix && return 0
