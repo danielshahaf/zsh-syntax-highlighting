@@ -265,7 +265,8 @@ _zsh_highlight_main_highlighter()
     if [[ $this_word == *':start:'* ]] && (( in_redirection == 0 )); then # $arg is the command word
      if [[ -n ${(M)ZSH_HIGHLIGHT_TOKENS_PRECOMMANDS:#"$arg"} ]]; then
       style=$ZSH_HIGHLIGHT_STYLES[precommand]
-     elif [[ "$arg" = "sudo" ]]; then
+     elif [[ "$arg" = "sudo" ]] ||
+          { (( $+aliases )) && (( $+aliases[$arg] )) && [[ $aliases[$arg] == "sudo" ]] }; then
       style=$ZSH_HIGHLIGHT_STYLES[precommand]
       next_word=${next_word//:regular:/}
       next_word+=':sudo_opt:'
