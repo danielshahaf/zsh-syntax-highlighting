@@ -308,11 +308,16 @@ _zsh_highlight_load_highlighters()
 # Setup
 # -------------------------------------------------------------------------------------------------
 
-# Try binding widgets.
-_zsh_highlight_bind_widgets || {
-  echo 'zsh-syntax-highlighting: failed binding ZLE widgets, exiting.' >&2
-  return 1
-}
+# Use zle-line-pre-redraw if available. Otherwise try binding widgets as fallback.
+autoload -Uz is-at-least
+if is-at-least 5.2; then
+  _zsh_highlight_set_or_wrap_special_zle_widget zle-line-pre-redraw
+else
+  _zsh_highlight_bind_widgets || {
+    echo 'zsh-syntax-highlighting: failed binding ZLE widgets, exiting.' >&2
+    return 1
+  }
+fi
 
 # Always wrap special zle-line-finish widget. This is needed to decide if the
 # current line ends and special highlighting logic needs to be applied.
