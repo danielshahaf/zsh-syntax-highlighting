@@ -44,6 +44,7 @@ This highlighter defines the following styles:
 * `assign` - parameter assignments
 * `redirection` - redirection operators (`<`, `>`, etc)
 * `comment` - comments, when `setopt INTERACTIVE_COMMENTS` is in effect (`echo # foo`)
+* `commandtypefromthefuture` - a command word other than one of those enumrated above (builtin/function/command/precommand/alias).
 * `default` - everything else
 
 To override one of those styles, change its entry in `ZSH_HIGHLIGHT_STYLES`,
@@ -64,5 +65,17 @@ for example in `~/.zshrc`:
 The syntax for values is the same as the syntax of "types of highlighting" of
 the zsh builtin `$zle_highlight` array, which is documented in [the `zshzle(1)`
 manual page][zshzle-Character-Highlighting].
+
+### Note for advanced users about a corner case nobody will ever encounter
+
+*Normal users: you can safely skip this paragraph; it concerns a corner case that
+is unlikely to ever materialize.*
+<br/>
+The `commandtypefromthefuture` style is included for forward compatibility with
+future versions of zsh: it will be used if the zsh we run under has more
+command word types than were known when this zsh-syntax-highlighting was
+released.  If that happens, the style `commandtypefromthefuture-$kind` will be
+looked up in preference to `commandtypefromthefuture`, where `$kind` is the output
+of `type -w` on the new kind of command word.
 
 [zshzle-Character-Highlighting]: http://zsh.sourceforge.net/Doc/Release/Zsh-Line-Editor.html#Character-Highlighting
