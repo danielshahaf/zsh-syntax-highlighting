@@ -34,7 +34,7 @@ syntax highlighting.
 
 ### Why does syntax highlighting not work while searching history?
 
-In `zsh` versions before 5.3 is not possible for `zsh-syntax-highlighting.zsh`
+In `zsh` versions before v5.3 it is not possible for `zsh-syntax-highlighting.zsh`
 to know if an incremental search is currently active and that matched parts of the
 buffer should be underlined (or otherwise highlighted). Therefore, it is not possible
 for `zsh-syntax-highlighting.zsh` to apply syntax highlighting and to underline the

@@ -58,10 +58,8 @@ _zsh_highlight()
   # Store the previous command return code to restore it whatever happens.
   local ret=$?
 
-  # Remove all highlighting in isearch, so that only the underlining done by zsh itself remains.
-  # For details see FAQ entry 'Why does syntax highlighting not work while searching history?'
-  # and http://www.zsh.org/mla/users/2016/msg00415.html.
-  if [[ $WIDGET == zle-isearch-update ]]; then
+  # Do not highlight in isearch if ISEARCH_ACTIVE is unsupported (zsh < 5.3).
+  if [[ $WIDGET == zle-isearch-update ]] && ! (( $+ISEARCH_ACTIVE )); then
     region_highlight=()
     return $ret
   fi
@@ -307,6 +305,21 @@ _zsh_highlight_bind_widgets()
   done
 }
 
+# Wrap special zle-* hooks if already bound, or set them otherwise.
+#
+# Takes a single argument.
+_zsh_highlight_set_or_wrap_special_zle_widget() {
+  local hook="$1"
+  local currentbinding="$widgets[$hook]"
+  if [[ -z "$currentbinding" ]]; then
+    eval "_zsh_highlight_widget_${(q)hook}() { :; _zsh_highlight }"
+    zle -N $hook _zsh_highlight_widget_$hook
+  elif [[ $currentbinding == user:* && $currentbinding != user:_zsh_highlight_widget_* ]]; then
+    eval "_zsh_highlight_widget_${(q)hook}() { ${(q)currentbinding#*:}; _zsh_highlight }"
+    zle -N $hook _zsh_highlight_widget_$hook
+  fi
+}
+
 # Load highlighters from directory.
 #
 # Arguments:
@@ -340,11 +353,24 @@ _zsh_highlight_load_highlighters()
 # Setup
 # -------------------------------------------------------------------------------------------------
 
-# Try binding widgets.
-_zsh_highlight_bind_widgets || {
-  print -r -- >&2 'zsh-syntax-highlighting: failed binding ZLE widgets, exiting.'
-  return 1
-}
+# Use zle-line-pre-redraw if available. Otherwise try binding widgets as fallback.
+autoload -Uz is-at-least
+if is-at-least 5.2; then
+  _zsh_highlight_set_or_wrap_special_zle_widget zle-line-pre-redraw
+else
+  _zsh_highlight_bind_widgets || {
+    print -r -- >&2 'zsh-syntax-highlighting: failed binding ZLE widgets, exiting.'
+    return 1
+  }
+fi
+
+# Always wrap special zle-line-finish widget. This is needed to decide if the
+# current line ends and special highlighting logic needs to be applied.
+# E.g. remove cursor imprint, don't highlight partial paths, ...
+_zsh_highlight_set_or_wrap_special_zle_widget zle-line-finish
+
+# Always wrap special zle-isearch-update widget to be notified of updates in isearch
+_zsh_highlight_set_or_wrap_special_zle_widget zle-isearch-update
 
 # Resolve highlighters directory location.
 _zsh_highlight_load_highlighters "${ZSH_HIGHLIGHT_HIGHLIGHTERS_DIR:-${${0:A}:h}/highlighters}" || {
