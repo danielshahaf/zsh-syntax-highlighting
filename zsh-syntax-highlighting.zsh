@@ -355,7 +355,7 @@ _zsh_highlight_load_highlighters()
 
 # Use zle-line-pre-redraw if available. Otherwise try binding widgets as fallback.
 autoload -Uz is-at-least
-if is-at-least 5.2; then
+if is-at-least 5.3; then
   _zsh_highlight_set_or_wrap_special_zle_widget zle-line-pre-redraw
 else
   _zsh_highlight_bind_widgets || {
