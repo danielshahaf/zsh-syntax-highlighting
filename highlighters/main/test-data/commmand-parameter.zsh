@@ -28,9 +28,11 @@
 # -------------------------------------------------------------------------------------------------
 
 x=/usr/bin/env
-BUFFER='$x "argument"'
+y=sudo
+BUFFER='$x "argument"; $y'
 
 expected_region_highlight=(
   "1 2 command" # $x
   "4 13 double-quoted-argument" # "argument"
+  "16 17 precommand 'parameter expansion precedes precommand recognition'" # $y (sudo)
 )
