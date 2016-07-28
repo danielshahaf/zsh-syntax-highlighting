@@ -189,6 +189,7 @@ _zsh_highlight_highlighter_main_paint()
   # for that precommand.
   local -A precommand_options
   precommand_options=(
+    'command' ''
     'sudo' Cgprtu
   )
 
@@ -205,7 +206,7 @@ _zsh_highlight_highlighter_main_paint()
     # ';;' ';&' ';|'
   )
   ZSH_HIGHLIGHT_TOKENS_PRECOMMANDS=(
-    'builtin' 'command' 'exec' 'nocorrect' 'noglob'
+    'builtin' 'exec' 'nocorrect' 'noglob'
     'pkexec' # immune to #121 because it's usually not passed --option flags
   )
 
@@ -438,14 +439,14 @@ _zsh_highlight_highlighter_main_paint()
 
    # The Great Fork: is this a command word?  Is this a non-command word?
    if [[ $this_word == *':start:'* ]] && (( in_redirection == 0 )); then # $arg is the command word
-     if [[ -n ${(M)ZSH_HIGHLIGHT_TOKENS_PRECOMMANDS:#"$arg"} ]]; then
-      style=precommand
-     elif (( ${+precommand_options[$arg]} )); then
+     if (( ${+precommand_options[$arg]} )); then
       style=precommand
       flags_with_argument=${precommand_options[$arg]}
       next_word=${next_word//:regular:/}
       next_word+=':sudo_opt:'
       next_word+=':start:'
+     elif [[ -n ${(M)ZSH_HIGHLIGHT_TOKENS_PRECOMMANDS:#"$arg"} ]]; then
+      style=precommand
      else
       case $res in
         reserved)       style=reserved-word;;
