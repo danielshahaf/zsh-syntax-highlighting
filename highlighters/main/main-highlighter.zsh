@@ -183,6 +183,16 @@ _zsh_highlight_main_highlighter()
   local buf="$PREBUFFER$BUFFER"
   integer len="${#buf}"
 
+  # $flags_with_argument is a set of letters, corresponding to the option letters
+  # that would be followed by a colon in a getopts specification.
+  local flags_with_argument
+  # $precommand_options maps precommand name to value of $flags_with_argument
+  # for that precommand.
+  local -A precommand_options
+  precommand_options=(
+    'sudo' Cgprtu
+  )
+
   if (( path_dirs_was_set )); then
     options_to_set+=( PATH_DIRS )
   fi
@@ -382,7 +392,8 @@ _zsh_highlight_main_highlighter()
       if [[ $this_word == *':sudo_opt:'* ]]; then
         case "$arg" in
           # Flag that requires an argument
-          '-'[Cgprtu]) this_word=${this_word//:start:/};
+          '-'[$flags_with_argument])
+                       this_word=${this_word//:start:/};
                        next_word=':sudo_arg:';;
           # This prevents misbehavior with sudo -u -otherargument
           '-'*)        this_word=${this_word//:start:/};
@@ -399,8 +410,9 @@ _zsh_highlight_main_highlighter()
     if [[ $this_word == *':start:'* ]] && (( in_redirection == 0 )); then # $arg is the command word
      if [[ -n ${(M)ZSH_HIGHLIGHT_TOKENS_PRECOMMANDS:#"$arg"} ]]; then
       style=precommand
-     elif [[ "$arg" = "sudo" ]]; then
+     elif (( ${+precommand_options[$arg]} )); then
       style=precommand
+      flags_with_argument=${precommand_options[$arg]}
       next_word=${next_word//:regular:/}
       next_word+=':sudo_opt:'
       next_word+=':start:'
