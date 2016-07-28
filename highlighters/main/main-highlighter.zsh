@@ -191,6 +191,7 @@ _zsh_highlight_main_highlighter()
   local -A precommand_options
   precommand_options=(
     'command' ''
+    'nice' n
     'sudo' Cgprtu
   )
 
