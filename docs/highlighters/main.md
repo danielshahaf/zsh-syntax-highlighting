@@ -74,7 +74,7 @@ is unlikely to ever materialize.*
 The `commandtypefromthefuture` style is included for forward compatibility with
 future versions of zsh: it will be used if the zsh we run under has more
 command word types than were known when this zsh-syntax-highlighting was
-released.  If that happens, the style `commandtypefromthefuture-$kind` will be
+released.  If that happens, the style `commandtypefromthefuture_$kind` will be
 looked up in preference to `commandtypefromthefuture`, where `$kind` is the output
 of `type -w` on the new kind of command word.
 

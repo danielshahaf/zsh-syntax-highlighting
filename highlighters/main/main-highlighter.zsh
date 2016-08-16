@@ -467,7 +467,7 @@ _zsh_highlight_main_highlighter()
                           fi
                         fi
                         ;;
-        *)              _zsh_highlight_main_add_region_highlight $start_pos $end_pos commandtypefromthefuture-$res commandtypefromthefuture
+        *)              _zsh_highlight_main_add_region_highlight $start_pos $end_pos commandtypefromthefuture_$res commandtypefromthefuture
                         already_added=1
                         ;;
       esac
