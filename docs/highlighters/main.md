@@ -44,7 +44,7 @@ This highlighter defines the following styles:
 * `assign` - parameter assignments
 * `redirection` - redirection operators (`<`, `>`, etc)
 * `comment` - comments, when `setopt INTERACTIVE_COMMENTS` is in effect (`echo # foo`)
-* `commandtypefromthefuture` - a command word other than one of those enumrated above (builtin/function/command/precommand/alias).
+* `commandtypefromthefuture` - a command word other than one of those enumrated above (other than a command, precommand, alias, function, or shell builtin command).
 * `default` - everything else
 
 To override one of those styles, change its entry in `ZSH_HIGHLIGHT_STYLES`,
@@ -66,16 +66,21 @@ The syntax for values is the same as the syntax of "types of highlighting" of
 the zsh builtin `$zle_highlight` array, which is documented in [the `zshzle(1)`
 manual page][zshzle-Character-Highlighting].
 
-### Note for advanced users about a corner case nobody will ever encounter
+### Useless trivia
 
-*Normal users: you can safely skip this paragraph; it concerns a corner case that
-is unlikely to ever materialize.*
-<br/>
-The `commandtypefromthefuture` style is included for forward compatibility with
-future versions of zsh: it will be used if the zsh we run under has more
-command word types than were known when this zsh-syntax-highlighting was
-released.  If that happens, the style `commandtypefromthefuture_$kind` will be
-looked up in preference to `commandtypefromthefuture`, where `$kind` is the output
-of `type -w` on the new kind of command word.
+zsh-syntax-highlighting attempts to be forward-compatible with zsh.
+Specifically, we attempt to facilitate highlighting _command word_ types that
+had not yet been invented when this version of zsh-syntax-highlighting was
+released.
+
+A _command word_ is something like a function name, external command name, et
+cetera.  (See [SIMPLE COMMANDS & PIPELINES in zshmisc(1)] for a formal
+definition.)
+
+If a new _kind_ of command word is ever added to zsh — something conceptually
+different than "function" and "alias" and "external command" — then command words
+of that (new) kind will be highlighted by the style `commandtypefromthefuture_$kind`,
+where `$kind` is the output of `type -w` on the new kind of command word.  If that
+style is not defined, then the style `commandtypefromthefuture` will be used instead.
 
 [zshzle-Character-Highlighting]: http://zsh.sourceforge.net/Doc/Release/Zsh-Line-Editor.html#Character-Highlighting
