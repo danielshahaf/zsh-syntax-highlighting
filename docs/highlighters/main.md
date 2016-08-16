@@ -74,13 +74,16 @@ had not yet been invented when this version of zsh-syntax-highlighting was
 released.
 
 A _command word_ is something like a function name, external command name, et
-cetera.  (See [SIMPLE COMMANDS & PIPELINES in zshmisc(1)] for a formal
-definition.)
+cetera.  (See
+[Simple Commands & Pipelines in `zshmisc(1)`][zshmisc-Simple-Commands-And-Pipelines]
+for a formal definition.)
 
 If a new _kind_ of command word is ever added to zsh — something conceptually
 different than "function" and "alias" and "external command" — then command words
 of that (new) kind will be highlighted by the style `commandtypefromthefuture_$kind`,
 where `$kind` is the output of `type -w` on the new kind of command word.  If that
 style is not defined, then the style `commandtypefromthefuture` will be used instead.
+
+[zshmisc-Simple-Commands-And-Pipelines]: http://zsh.sourceforge.net/Doc/Release/Shell-Grammar.html#Simple-Commands-_0026-Pipelines
 
 [zshzle-Character-Highlighting]: http://zsh.sourceforge.net/Doc/Release/Zsh-Line-Editor.html#Character-Highlighting
