@@ -58,7 +58,7 @@
 : ${ZSH_HIGHLIGHT_STYLES[assign]:=none}
 : ${ZSH_HIGHLIGHT_STYLES[redirection]:=none}
 : ${ZSH_HIGHLIGHT_STYLES[comment]:=fg=black,bold}
-: ${ZSH_HIGHLIGHT_STYLES[commandtypefromthefuture]:=fg=green}
+: ${ZSH_HIGHLIGHT_STYLES[commandtype]:=fg=green}
 
 # Whether the highlighter should be called or not.
 _zsh_highlight_main_highlighter_predicate()
@@ -467,7 +467,7 @@ _zsh_highlight_main_highlighter()
                           fi
                         fi
                         ;;
-        *)              _zsh_highlight_main_add_region_highlight $start_pos $end_pos commandtypefromthefuture_$res commandtypefromthefuture
+        *)              _zsh_highlight_main_add_region_highlight $start_pos $end_pos commandtype_$res commandtype
                         already_added=1
                         ;;
       esac

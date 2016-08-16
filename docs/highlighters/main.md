@@ -44,7 +44,7 @@ This highlighter defines the following styles:
 * `assign` - parameter assignments
 * `redirection` - redirection operators (`<`, `>`, etc)
 * `comment` - comments, when `setopt INTERACTIVE_COMMENTS` is in effect (`echo # foo`)
-* `commandtypefromthefuture` - a command word other than one of those enumrated above (other than a command, precommand, alias, function, or shell builtin command).
+* `commandtype` - a command word other than one of those enumrated above (other than a command, precommand, alias, function, or shell builtin command).
 * `default` - everything else
 
 To override one of those styles, change its entry in `ZSH_HIGHLIGHT_STYLES`,
@@ -80,9 +80,9 @@ for a formal definition.)
 
 If a new _kind_ of command word is ever added to zsh — something conceptually
 different than "function" and "alias" and "external command" — then command words
-of that (new) kind will be highlighted by the style `commandtypefromthefuture_$kind`,
+of that (new) kind will be highlighted by the style `commandtype_$kind`,
 where `$kind` is the output of `type -w` on the new kind of command word.  If that
-style is not defined, then the style `commandtypefromthefuture` will be used instead.
+style is not defined, then the style `commandtype` will be used instead.
 
 [zshmisc-Simple-Commands-And-Pipelines]: http://zsh.sourceforge.net/Doc/Release/Shell-Grammar.html#Simple-Commands-_0026-Pipelines
 
