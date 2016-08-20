@@ -53,7 +53,7 @@
 # Overwrite _zsh_highlight_add_highlight so we get the key itself instead of the style
 _zsh_highlight_add_highlight()
 {
-  region_highlight+=("$1 $2 $3")
+  region_highlight+=("$1 $2 ${(j.,.)argv[3,-1]}")
 }
 
 # Activate the highlighter.

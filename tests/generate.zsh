@@ -49,7 +49,7 @@ git add -N ${0:A:h:h}/highlighters/$2/test-data/$3.zsh
 # Overwrite _zsh_highlight_add_highlight so we get the key itself instead of the style
 _zsh_highlight_add_highlight()
 {
-  region_highlight+=("$1 $2 $3")
+  region_highlight+=("$1 $2 ${(j.,.)argv[3,-1]}")
 }
 
 # Copyright block
