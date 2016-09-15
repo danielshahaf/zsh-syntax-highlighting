@@ -192,6 +192,7 @@ _zsh_highlight_highlighter_main_paint()
     'command' ''
     'nice' n
     'sudo' Cgprtu
+    'doas' aCu
   )
 
   if (( path_dirs_was_set )); then
