@@ -606,6 +606,7 @@ _zsh_highlight_highlighter_main_paint()
      fi
    fi
    if (( ! already_added )) && [[ $style == unknown-token ]] && # not handled by the 'command word' codepath
+      [[ $this_word != '*:function:*' ]] && [[ $this_word != '*:function-brace:*' ]] && 
       { (( in_redirection )) || [[ $this_word == *':regular:'* ]] || [[ $this_word == *':sudo_opt:'* ]] || [[ $this_word == *':sudo_arg:'* ]] }
    then # $arg is a non-command word
       case $arg in
