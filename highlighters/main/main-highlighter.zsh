@@ -269,6 +269,8 @@ _zsh_highlight_highlighter_main_paint()
   # - :regular:    "Not a command word", and command delimiters are permitted.
   #                Mainly used to detect premature termination of commands.
   # - :always:     The word 'always' in the «{ foo } always { bar }» syntax.
+  # - :function:   Function names in the «function f g h { }» syntax.
+  # - :function-brace:  Opening brace in the «function f g h { }» syntax.
   #
   # When the kind of a word is not yet known, $this_word / $next_word may contain
   # multiple states.  For example, after "sudo -i", the next word may be either
@@ -436,6 +438,19 @@ _zsh_highlight_highlighter_main_paint()
      # try-always construct
      style=reserved-word # de facto a reserved word, although not de jure
      next_word=':start:'
+   elif [[ $this_word == *':function-brace:'* ]] && [[ $arg == $'\x7b' ]]; then
+     style=reserved-word
+     braces_stack='Y'"$braces_stack"
+     next_word=':start:'
+   elif [[ $this_word == *':function:'* ]]; then
+     next_word=':function-brace:'
+     if (( multi_func_def )); then
+       next_word+=':function:'
+     fi
+     # Nearly anything can be used as a function name.  The following test is not intended to be complete.
+     if [[ $arg == *[A-Za-z0-9_]* ]]; then
+       style=default
+     fi
    elif [[ $this_word == *':start:'* ]] && (( in_redirection == 0 )); then # $arg is the command word
      if [[ -n ${(M)ZSH_HIGHLIGHT_TOKENS_PRECOMMANDS:#"$arg"} ]]; then
       style=precommand
@@ -491,6 +506,9 @@ _zsh_highlight_highlighter_main_paint()
                             ;;
                           ('end')
                             _zsh_highlight_main__stack_pop '$' style=reserved-word
+                            ;;
+                          ('function')
+                            next_word=':function:'
                             ;;
                         esac
                         ;;
