@@ -210,7 +210,7 @@ _zsh_highlight_highlighter_main_paint()
   fi
 
   ## Variable declarations and initializations
-  local start_pos=0 end_pos highlight_glob=true arg style
+  local start_pos=0 end_pos highlight_glob=true saw_assignment=false arg style
   local in_array_assignment=false # true between 'a=(' and the matching ')'
   typeset -a ZSH_HIGHLIGHT_TOKENS_COMMANDSEPARATOR
   typeset -a ZSH_HIGHLIGHT_TOKENS_PRECOMMANDS
@@ -335,6 +335,7 @@ _zsh_highlight_highlighter_main_paint()
     #   $style               how to highlight $arg
     #   $in_array_assignment boolean flag for "between '(' and ')' of array assignment"
     #   $highlight_glob      boolean flag for "'noglob' is in effect"
+    #   $saw_assignment      boolean flag for "was preceded by an assignment"
     #
     # $already_added is set to 1 to disable adding an entry to region_highlight
     # for this iteration.  Currently, that is done for "" and $'' strings,
@@ -487,7 +488,7 @@ _zsh_highlight_highlighter_main_paint()
       }
       case $res in
         reserved)       # reserved word
-                        style=reserved-word
+                        $saw_assignment && style=unknown-token || style=reserved-word 
                         #
                         # Match braces.
                         case $arg in
@@ -570,6 +571,7 @@ _zsh_highlight_highlighter_main_paint()
         hashed)         style=hashed-command;;
         none)           if _zsh_highlight_main_highlighter_check_assign; then
                           style=assign
+                          saw_assignment=true
                           if [[ $arg[-1] == '(' ]]; then
                             in_array_assignment=true
                           else
@@ -717,6 +719,7 @@ _zsh_highlight_highlighter_main_paint()
       else
         next_word=':start:'
         highlight_glob=true
+        saw_assignment=false
       fi
     elif
        [[ -n ${(M)ZSH_HIGHLIGHT_TOKENS_CONTROL_FLOW:#"$arg"} && $this_word == *':start:'* ]] ||
