@@ -192,6 +192,31 @@ _zsh_highlight_main__stack_pop() {
   fi
 }
 
+# Check whether the current word ($1, of type $2) is valid at this position,
+# and if it is, execute the assignment in $3.
+#
+# Accesses parent's $saw_assignment.
+_zsh_highlight_main__is_valid_after_assignment()
+{
+  local arg=$1 res=$2
+  if $saw_assignment && 
+     [[ $arg != ('export'|'declare'|'float'|'typeset'|'integer'|'readonly'|'local'|'nocorrect') ]] &&
+     [[ $arg != $'\x29' ]] && # '(a=42)' is valid
+     true
+  then
+    # "Parameter assignments may precede only a simple command", which is
+    # basically everything in the $res case/esac except reserved words not
+    # in this whitelist.
+    #
+    # reference: users/23001
+    style=unknown-token
+    return 1
+  else
+    eval "$3"
+    return 0
+  fi
+}
+
 # Main syntax highlighting function.
 _zsh_highlight_highlighter_main_paint()
 {
@@ -488,7 +513,8 @@ _zsh_highlight_highlighter_main_paint()
       }
       case $res in
         reserved)       # reserved word
-                        $saw_assignment && style=unknown-token || style=reserved-word 
+                        style=reserved-word 
+                        _zsh_highlight_main__is_valid_after_assignment
                         #
                         # Match braces.
                         case $arg in
@@ -604,18 +630,22 @@ _zsh_highlight_highlighter_main_paint()
                           # We highlight just the opening parentheses, as a reserved word; this
                           # is how [[ ... ]] is highlighted, too.
                           style=reserved-word
-                          _zsh_highlight_main_add_region_highlight $start_pos $((start_pos + 2)) $style
-                          already_added=1
-                          if [[ $arg[-2,-1] == '))' ]]; then
-                            _zsh_highlight_main_add_region_highlight $((end_pos - 2)) $end_pos $style
+                          if _zsh_highlight_main__is_valid_after_assignment; then
+                            _zsh_highlight_main_add_region_highlight $start_pos $((start_pos + 2)) $style
                             already_added=1
+                            if [[ $arg[-2,-1] == '))' ]]; then
+                              _zsh_highlight_main_add_region_highlight $((end_pos - 2)) $end_pos $style
+                              already_added=1
+                            fi
                           fi
                         elif [[ $arg == '()' ]]; then
                           # anonymous function
                           style=reserved-word
+                          _zsh_highlight_main__is_valid_after_assignment
                         elif [[ $arg == $'\x28' ]]; then
                           # subshell
                           style=reserved-word
+                          _zsh_highlight_main__is_valid_after_assignment
                           braces_stack='R'"$braces_stack"
                         elif [[ $arg == $'\x29' ]]; then
                           # end of subshell
@@ -652,6 +682,7 @@ _zsh_highlight_highlighter_main_paint()
                    next_word+=':start:'
                  fi
                  style=reserved-word
+                 _zsh_highlight_main__is_valid_after_assignment
                  ;;
         $'\x7d') # right brace
                  #
@@ -663,6 +694,7 @@ _zsh_highlight_highlighter_main_paint()
                    _zsh_highlight_main__stack_pop 'Y' style=reserved-word
                    if [[ $style == reserved-word ]]; then
                      next_word+=':always:'
+                     _zsh_highlight_main__is_valid_after_assignment
                    fi
                  else
                    # Fall through to the catchall case at the end.
