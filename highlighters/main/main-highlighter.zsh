@@ -307,6 +307,7 @@ _zsh_highlight_highlighter_main_paint()
   # - :regular:    "Not a command word", and command delimiters are permitted.
   #                Mainly used to detect premature termination of commands.
   # - :always:     The word 'always' in the «{ foo } always { bar }» syntax.
+  # - :end:        Command delimiters are permitted.
   #
   # When the kind of a word is not yet known, $this_word / $next_word may contain
   # multiple states.  For example, after "sudo -i", the next word may be either
@@ -433,6 +434,7 @@ _zsh_highlight_highlighter_main_paint()
     #
     # We use the (Z+c+) flag so the entire comment is presented as one token in $arg.
     if [[ $useroptions[interactivecomments] == on && $arg[1] == $histchars[3] ]]; then
+      # TODO: should this allow :end: in addition to :regular:?
       if [[ $this_word == *(':regular:'|':start:')* ]]; then
         style=comment
       else
@@ -486,6 +488,8 @@ _zsh_highlight_highlighter_main_paint()
       style=precommand
      elif [[ "$arg" = "sudo" ]] && { _zsh_highlight_main__type sudo; [[ -n $REPLY && $REPLY != "none" ]] }; then
       style=precommand
+      # TODO: should this remove :end: in addition to :regular:?
+      # TODO: review :regular:/:end:
       next_word=${next_word//:regular:/}
       next_word+=':sudo_opt:'
       next_word+=':start:'
@@ -603,14 +607,14 @@ _zsh_highlight_highlighter_main_paint()
                           else
                             # assignment to a scalar parameter.
                             # (For array assignments, the command doesn't start until the ")" token.)
-                            next_word+=':start:'
+                            next_word=':start:'':end:'
                           fi
                         elif [[ $arg[0,1] = $histchars[0,1] ]] && (( $#arg[0,2] == 2 )); then
                           style=history-expansion
                         elif [[ $arg[0,1] == $histchars[2,2] ]]; then
                           style=history-expansion
                         elif [[ -n ${(M)ZSH_HIGHLIGHT_TOKENS_COMMANDSEPARATOR:#"$arg"} ]]; then
-                          if [[ $this_word == *':regular:'* ]]; then
+                          if [[ $this_word == *(':regular:'|':end:')* ]]; then
                             # This highlights empty commands (semicolon follows nothing) as an error.
                             # Zsh accepts them, though.
                             style=commandseparator
@@ -672,7 +676,7 @@ _zsh_highlight_highlighter_main_paint()
                  if $in_array_assignment; then
                    style=assign
                    in_array_assignment=false
-                   next_word+=':start:'
+                   next_word=':start::end:'
                  else
                    _zsh_highlight_main__stack_pop 'R' style=reserved-word
                  fi;;
@@ -723,7 +727,7 @@ _zsh_highlight_highlighter_main_paint()
                  elif [[ $arg[0,1] = $histchars[0,1] ]] && (( $#arg[0,2] == 2 )); then
                    style=history-expansion
                  elif [[ -n ${(M)ZSH_HIGHLIGHT_TOKENS_COMMANDSEPARATOR:#"$arg"} ]]; then
-                   if [[ $this_word == *':regular:'* ]]; then
+                   if [[ $this_word == *(':regular:'|':end:')* ]]; then
                      style=commandseparator
                    else
                      style=unknown-token
