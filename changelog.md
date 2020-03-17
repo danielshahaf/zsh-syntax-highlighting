@@ -38,6 +38,10 @@
 - Fix `echo >&2` highlighting the `2` as a filename if a file by that name happened to exist
   [#694]
 
+- When `set -u` (aka `unsetopt UNSET`) is in effect, and `$foo` is unset (not merely empty),
+  highlight `: "$foo"` as an error.
+  [#450]
+
 # Changes in version 0.7.1
 
 - Remove out-of-date information from the 0.7.0 changelog.

@@ -1348,9 +1348,15 @@ _zsh_highlight_main_highlighter_highlight_double_quote()
             if [[ ${arg:$i} =~ ^([A-Za-z_][A-Za-z0-9_]*|[0-9]+) ]] ; then
               (( k += $#MATCH )) # highlight the parameter name
               (( i += $#MATCH )) # skip past it
+              if [[ $zsyh_user_options[unset] == off ]] && (( ! ${(P)+MATCH} )); then
+                style=unknown-token
+              fi
             elif [[ ${arg:$i} =~ ^[{]([A-Za-z_][A-Za-z0-9_]*|[0-9]+)[}] ]] ; then
               (( k += $#MATCH )) # highlight the parameter name and braces
               (( i += $#MATCH )) # skip past it
+              if [[ $zsyh_user_options[unset] == on ]] && (( ! ${(P)+MATCH} )); then
+                style=unknown-token
+              fi
             elif [[ $arg[i+1] == '$' ]]; then
               # $$ - pid
               (( k += 1 )) # highlight both dollar signs
