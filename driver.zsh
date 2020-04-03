@@ -85,27 +85,6 @@ _zsh_highlight()
     return $ret
   fi
 
-  # Before we 'emulate -L', save the user's options
-  local -A zsyh_user_options
-  if zmodload -e zsh/parameter; then
-    zsyh_user_options=("${(kv)options[@]}")
-  else
-    local canonical_options onoff option raw_options
-    raw_options=(${(f)"$(emulate -R zsh; set -o)"})
-    canonical_options=(${${${(M)raw_options:#*off}%% *}#no} ${${(M)raw_options:#*on}%% *})
-    for option in "${canonical_options[@]}"; do
-      [[ -o $option ]]
-      case $? in
-        (0) zsyh_user_options+=($option on);;
-        (1) zsyh_user_options+=($option off);;
-        (*) # Can't happen, surely?
-            echo "zsh-syntax-highlighting: warning: '[[ -o $option ]]' returned $?"
-            ;;
-      esac
-    done
-  fi
-  typeset -r zsyh_user_options
-
   emulate -L zsh
   setopt localoptions warncreateglobal nobashrematch
   local REPLY # don't leak $REPLY into global scope
