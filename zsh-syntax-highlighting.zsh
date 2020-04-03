@@ -73,7 +73,7 @@ local -a zsh_highlight__argv; zsh_highlight__argv=( "$@" )
   typeset -r zsyh_user_options
   
   # The following parameter expansion is a functionargzero-resistant spelling of "${0:h}".
-  source "${${(%):-%N}:h}"/driver.zsh "$@"
+  emulate zsh -c 'source "${${(%):-%N}:h}"/driver.zsh "$@"'
 }
 unset zsh_highlight__argv
 
